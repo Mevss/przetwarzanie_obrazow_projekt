@@ -103,12 +103,12 @@ class ImageBinarizerApp:
     def load_image(self):
         file_path = filedialog.askopenfilename(filetypes=[("Image files", "*.png *.jpg *.jpeg *.bmp *.gif")])
         if file_path:
-            img = cv2.imread(file_path, cv2.IMREAD_GRAYSCALE)
-            self.original_image = img.copy()
-            img = cv2.resize(img, (250, 250), interpolation=cv2.INTER_AREA)
-            img = cv2.cvtColor(img, cv2.COLOR_GRAY2RGB)
-            img_pil = Image.fromarray(img)
-            self.original_photo = ImageTk.PhotoImage(img_pil)
+            img = cv2.imread(file_path, cv2.IMREAD_GRAYSCALE) # Wczytanie obrazu w odcieniach szarości
+            self.original_image = img.copy() # Zapisanie oryginalnego obrazu
+            img = cv2.resize(img, (250, 250), interpolation=cv2.INTER_AREA) # Zmiana rozmiaru obrazu
+            img = cv2.cvtColor(img, cv2.COLOR_GRAY2RGB) # Konwersja na RGB
+            img_pil = Image.fromarray(img) # Tworzenie obrazu PIL
+            self.original_photo = ImageTk.PhotoImage(img_pil) # Tworzenie obrazu Tkinter
             self.original_canvas.create_image(125, 125, image=self.original_photo, anchor=ctk.CENTER)
 
     def binarize_image(self):
