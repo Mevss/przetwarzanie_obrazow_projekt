@@ -103,12 +103,12 @@ class ImageBinarizerApp:
 
         self.image_label = ctk.CTkLabel(content_frame, text="Obraz początkowy", **button_config)
         self.image_label.pack()
-        self.original_canvas = ctk.CTkCanvas(content_frame, width=250, height=250, bg="lightgray")
+        self.original_canvas = ctk.CTkCanvas(content_frame, width=250, height=250, bg="lightgray", highlightthickness=0)
         self.original_canvas.pack(pady=10)
 
         self.final_label = ctk.CTkLabel(content_frame, text="Obraz końcowy", **button_config)
         self.final_label.pack()
-        self.final_canvas = ctk.CTkCanvas(content_frame, width=250, height=250, bg="lightgray")
+        self.final_canvas = ctk.CTkCanvas(content_frame, width=250, height=250, bg="lightgray", highlightthickness=0)
         self.final_canvas.pack(pady=10)
 
     def load_image(self):
