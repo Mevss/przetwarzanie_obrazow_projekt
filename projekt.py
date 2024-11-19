@@ -297,7 +297,8 @@ class ImageBinarizerApp:
                                                                 ("JPEG files", "*.jpg"),
                                                                 ("All files", "*.*")])
             if file_path:
-                save_img = self.binary_image.astype(np.uint8)
+                save_img = cv2.resize(self.binary_image, (250, 250), interpolation=cv2.INTER_AREA)
+                save_img = save_img.astype(np.uint8)
                 cv2.imwrite(file_path, save_img)
 
     def change_language(self):
