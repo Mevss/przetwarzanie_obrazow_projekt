@@ -3,15 +3,14 @@ from customtkinter import filedialog
 import cv2
 import numpy as np
 from PIL import Image, ImageTk
-from matplotlib import pyplot as plt
 
 
 class ImageBinarizerApp:
     def __init__(self, master):
         self.master = master
         master.title("Binaryzacja warunkowa")
-        master.geometry("800x600")
-        master.minsize(600, 650)
+        master.geometry("950x810")
+        master.minsize(950, 810)
 
         ctk.set_appearance_mode("dark")
         ctk.set_default_color_theme("blue")
@@ -19,13 +18,15 @@ class ImageBinarizerApp:
         self.languages = {
             'pl': {
                 'title': 'Binaryzacja warunkowa',
+                'title_label': 'Binaryzacja warunkowa',
                 'load': 'Wczytaj obraz',
                 'binarize': 'Binaryzuj',
-                'save': 'Zapisz',
-                'histogram': 'Pokaż histogram',
+                'save': 'Zapisz obraz',
+                'histogram_label': "Histogram obrazu wejściowego",
+                'output_histogram_label': "Histogram obrazu wyjściowego",
                 'change_lang': 'English',
-                'image': 'Obraz początkowy',
-                'final_image': 'Obraz końcowy',
+                'image': 'Obraz wejściowy',
+                'final_image': 'Obraz wyjściowy',
                 'lower_thresh': 'Dolny próg:',
                 'higher_thresh': 'Górny próg:',
                 'dropdown_label': 'Wybierz kierunek:',
@@ -34,10 +35,12 @@ class ImageBinarizerApp:
             },
             'en': {
                 'title': 'Conditional binarization',
+                'title_label': 'Conditional binarization',
                 'load': 'Load Image',
-                'binarize': 'Binarize',
-                'save': 'Save',
-                'histogram': 'Show histogram',
+                'binarize': 'Binarise',
+                'save': 'Save image',
+                'histogram_label': "Input image histogram",
+                'output_histogram_label': "Output image histogram",
                 'change_lang': 'Polski',
                 'image': 'Input Image',
                 'final_image': 'Output Image',
@@ -54,9 +57,21 @@ class ImageBinarizerApp:
         self.binary_image = None
         font = ("Helvetica", 15, "bold")
         button_config = {'width': 160, 'height': 35, 'font': font}
+        self.bg_color = "#2b2b2b"
 
-        main_frame = ctk.CTkFrame(master)
-        main_frame.pack(fill=ctk.BOTH, expand=True)
+        container = ctk.CTkFrame(master)
+        container.pack(fill=ctk.BOTH, expand=True)
+
+        title_frame = ctk.CTkFrame(container, fg_color=self.bg_color)
+        title_frame.pack(fill=ctk.X, padx=10, pady=(10, 0))
+
+        title_label = ctk.CTkLabel(title_frame,text="Binaryzacja warunkowa",font=("Helvetica", 32, "bold"), height=50 )
+        title_label.pack(pady=10)
+        self.title_label = title_label
+
+
+        main_frame = ctk.CTkFrame(container, fg_color=self.bg_color)
+        main_frame.pack(fill=ctk.BOTH, expand=True, padx=10, pady=10)
 
         menu_frame = ctk.CTkFrame(main_frame, width=240)
         menu_frame.pack(side=ctk.LEFT, fill=ctk.BOTH, padx=0, pady=0)
@@ -64,6 +79,47 @@ class ImageBinarizerApp:
 
         content_frame = ctk.CTkFrame(main_frame)
         content_frame.pack(side=ctk.RIGHT, fill=ctk.BOTH, expand=True, padx=10, pady=10)
+
+        top_frame = ctk.CTkFrame(content_frame)
+        top_frame.pack(fill=ctk.X, padx=5, pady=5)
+
+        input_frame = ctk.CTkFrame(top_frame)
+        input_frame.pack(side=ctk.LEFT, padx=50, pady=25)
+
+        self.image_label = ctk.CTkLabel(input_frame, text="Obraz wejściowy", **button_config)
+        self.image_label.pack()
+        self.original_canvas = ctk.CTkCanvas(input_frame, width=250, height=250, bg="white", highlightthickness=0)
+        self.original_canvas.pack()
+
+        histogram_frame = ctk.CTkFrame(top_frame)
+        histogram_frame.pack(side=ctk.LEFT, padx=25)
+
+        self.histogram_label = ctk.CTkLabel(histogram_frame, text="Histogram obrazu wejściowego", **button_config)
+        self.histogram_label.pack()
+        self.histogram_canvas = ctk.CTkCanvas(histogram_frame, width=250, height=250, bg="white", highlightthickness=0)
+        self.histogram_canvas.pack()
+
+        output_frame = ctk.CTkFrame(content_frame)
+        output_frame.pack(fill=ctk.X, padx=5, pady=5)
+
+        output_image_frame = ctk.CTkFrame(output_frame)
+        output_image_frame.pack(side=ctk.LEFT, padx=50, pady=25)
+
+        self.final_label = ctk.CTkLabel(output_image_frame, text="Obraz wyjściowy", **button_config)
+        self.final_label.pack()
+        self.final_canvas = ctk.CTkCanvas(output_image_frame, width=250, height=250, bg="white",
+                                          highlightthickness=0)
+        self.final_canvas.pack()
+
+        output_histogram_frame = ctk.CTkFrame(output_frame)
+        output_histogram_frame.pack(side=ctk.LEFT, padx=25)
+
+        self.output_histogram_label = ctk.CTkLabel(output_histogram_frame, text="Histogram obrazu wyjściowego",
+                                                   **button_config)
+        self.output_histogram_label.pack()
+        self.output_histogram_canvas = ctk.CTkCanvas(output_histogram_frame, width=250, height=250, bg="white",
+                                                     highlightthickness=0)
+        self.output_histogram_canvas.pack()
 
         self.load_button = ctk.CTkButton(menu_frame, text="Wczytaj obraz", command=self.load_image, **button_config)
         self.load_button.pack(pady=25, padx=10)
@@ -92,39 +148,61 @@ class ImageBinarizerApp:
         self.process_button = ctk.CTkButton(menu_frame, text="Binaryzuj", command=self.binarize_image, **button_config)
         self.process_button.pack(pady=15, padx=10)
 
-        self.histogram_button = ctk.CTkButton(menu_frame, text="Pokaż histogram", command=self.display_histogram, **button_config)
-        self.histogram_button.pack(pady=15, padx=10)
-
-        self.save_button = ctk.CTkButton(menu_frame, text="Zapisz", command=self.save_image, **button_config)
+        self.save_button = ctk.CTkButton(menu_frame, text="Zapisz obraz", command=self.save_image, **button_config)
         self.save_button.pack(pady=15, padx=10)
 
         self.language_button = ctk.CTkButton(menu_frame, text="English", command=self.change_language, **button_config)
         self.language_button.pack(side=ctk.BOTTOM, pady=20, padx=10)
 
-        self.image_label = ctk.CTkLabel(content_frame, text="Obraz początkowy", **button_config)
-        self.image_label.pack()
-        self.original_canvas = ctk.CTkCanvas(content_frame, width=250, height=250, bg="lightgray", highlightthickness=0)
-        self.original_canvas.pack(pady=10)
+    def draw_histogram(self, image, canvas, is_binary=False):
+        if image is not None:
+            canvas.delete("all")
 
-        self.final_label = ctk.CTkLabel(content_frame, text="Obraz końcowy", **button_config)
-        self.final_label.pack()
-        self.final_canvas = ctk.CTkCanvas(content_frame, width=250, height=250, bg="lightgray", highlightthickness=0)
-        self.final_canvas.pack(pady=10)
+            hist = cv2.calcHist([image], [0], None, [256], [0, 256])
+
+            canvas_height = 250
+            canvas_width = 250
+            max_val = np.max(hist)
+            normalized_hist = hist * (canvas_height - 40) / max_val
+
+            # Rysujemy osie
+            canvas.create_line(30, canvas_height - 30, canvas_width - 10, canvas_height - 30,
+                               fill="black", width=2)
+            canvas.create_line(30, 10, 30, canvas_height - 30, fill="black", width=2)
+
+            bar_width = (canvas_width - 40) / 256
+            for i in range(256):
+                height = int(normalized_hist[i][0])
+                x1 = 30 + i * bar_width
+                y1 = canvas_height - 30
+                x2 = 30 + (i + 1) * bar_width
+                y2 = canvas_height - 30 - height
+                canvas.create_line(x1, y1, x1, y2, fill="black")
+
+            value_points = [0, 50, 100, 150, 200, 255]
+            for value in value_points:
+                x = 30 + value * (canvas_width - 40) / 255
+                canvas.create_line(x, canvas_height - 30, x, canvas_height - 25, fill="black")
+                canvas.create_text(x, canvas_height - 18, text=str(value), fill="black")
+
+            canvas.create_text(canvas_width // 2, canvas_height - 5,
+                               text="Poziom jasności", fill="black", font=("Helvetica", 12, "bold"))
+            canvas.create_text(15, canvas_height // 2,
+                               text="Liczba pikseli", fill="black", angle=90, font=("Helvetica", 12, "bold"))
 
     def load_image(self):
         file_path = filedialog.askopenfilename(filetypes=[("Image files", "*.png *.jpg *.jpeg *.bmp *.gif")])
         if file_path:
-            # Wczytanie obraz w skali szarości
             img = cv2.imread(file_path, cv2.IMREAD_GRAYSCALE)
             self.original_image = img.copy()
 
-            # Zmiana rozmiarow obrazu
             display_img = cv2.resize(img, (250, 250), interpolation=cv2.INTER_AREA)
 
-            # Konwertowanie na format PIL
             display_img = Image.fromarray(display_img)
             self.original_photo = ImageTk.PhotoImage(display_img)
             self.original_canvas.create_image(125, 125, image=self.original_photo, anchor=ctk.CENTER)
+
+            self.draw_histogram(self.original_image, self.histogram_canvas)
 
     def binarize_image(self):
         if self.original_image is not None:
@@ -206,10 +284,11 @@ class ImageBinarizerApp:
             self.binary_image = binary
 
             display_binary = cv2.resize(binary, (250, 250), interpolation=cv2.INTER_AREA)
-
             display_binary = Image.fromarray(display_binary)
             self.binary_photo = ImageTk.PhotoImage(display_binary)
             self.final_canvas.create_image(125, 125, image=self.binary_photo, anchor=ctk.CENTER)
+
+            self.draw_histogram(self.binary_image, self.output_histogram_canvas, is_binary=True)
 
     def save_image(self):
         if self.binary_image is not None:
@@ -221,17 +300,6 @@ class ImageBinarizerApp:
                 save_img = self.binary_image.astype(np.uint8)
                 cv2.imwrite(file_path, save_img)
 
-    def display_histogram(self):
-        if self.original_image is not None:
-            hist = cv2.calcHist([self.original_image], [0], None, [256], [0, 256])
-            plt.figure()
-            plt.title("Histogram")
-            plt.xlabel("Intensywność")
-            plt.ylabel("Liczba pikseli")
-            plt.plot(hist)
-            plt.xlim([0, 256])
-            plt.show()
-
     def change_language(self):
         self.current_lang = 'en' if self.current_lang == 'pl' else 'pl'
         self.update_language()
@@ -241,12 +309,14 @@ class ImageBinarizerApp:
 
         lang = self.languages[self.current_lang]
         self.master.title(lang['title'])
+        self.title_label.configure(text=lang['title_label'])
         self.load_button.configure(text=lang['load'])
         self.process_button.configure(text=lang['binarize'])
         self.save_button.configure(text=lang['save'])
-        self.histogram_button.configure(text=lang['histogram'])
         self.language_button.configure(text=lang['change_lang'])
         self.image_label.configure(text=lang['image'])
+        self.histogram_label.configure(text=lang['histogram_label'])
+        self.output_histogram_label.configure(text=lang['output_histogram_label'])
         self.final_label.configure(text=lang['final_image'])
         self.lower_thresh_label.configure(text=lang['lower_thresh'])
         self.higher_thresh_label.configure(text=lang['higher_thresh'])
