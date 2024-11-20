@@ -31,7 +31,9 @@ class ImageBinarizerApp:
                 'higher_thresh': 'Górny próg:',
                 'dropdown_label': 'Wybierz kierunek:',
                 'dropdown_options': ['Lewo > Prawo', 'Prawo > Lewo', 'Góra > Dół', 'Dół > Góra'],
-                'current_selection': 'Lewo > prawo'
+                'current_selection': 'Lewo > prawo',
+                'brightness_level': 'Poziom jasności',
+                'pixel_count': 'Liczba pikseli'
             },
             'en': {
                 'title': 'Conditional binarization',
@@ -48,8 +50,11 @@ class ImageBinarizerApp:
                 'higher_thresh': 'Higher threshold:',
                 'dropdown_label': 'Select direction:',
                 'dropdown_options': ['Left > Right', 'Right > Left', 'Top > Bottom', 'Bottom > Top'],
-                'current_selection': 'Left > Right'
-            }
+                'current_selection': 'Left > Right',
+                'brightness_level': 'Brightness level',
+                'pixel_count': 'Pixel count'
+
+        }
         }
 
         self.current_lang = 'pl'
@@ -160,12 +165,14 @@ class ImageBinarizerApp:
 
             hist = cv2.calcHist([image], [0], None, [256], [0, 256])
 
-            canvas_height = 250
-            canvas_width = 250
+            scale_factor = 0.98
+
+            canvas_height = int(250 * scale_factor)
+            canvas_width = int(250 * scale_factor)
+
             max_val = np.max(hist)
             normalized_hist = hist * (canvas_height - 40) / max_val
 
-            # Rysujemy osie
             canvas.create_line(30, canvas_height - 30, canvas_width - 10, canvas_height - 30,
                                fill="black", width=2)
             canvas.create_line(30, 10, 30, canvas_height - 30, fill="black", width=2)
@@ -185,10 +192,11 @@ class ImageBinarizerApp:
                 canvas.create_line(x, canvas_height - 30, x, canvas_height - 25, fill="black")
                 canvas.create_text(x, canvas_height - 18, text=str(value), fill="black")
 
+            lang = self.languages[self.current_lang]
             canvas.create_text(canvas_width // 2, canvas_height - 5,
-                               text="Poziom jasności", fill="black", font=("Helvetica", 12, "bold"))
+                               text=lang['brightness_level'], fill="black", font=("Helvetica", 10, "bold"))
             canvas.create_text(15, canvas_height // 2,
-                               text="Liczba pikseli", fill="black", angle=90, font=("Helvetica", 12, "bold"))
+                               text=lang['pixel_count'], fill="black", angle=90, font=("Helvetica", 10, "bold"))
 
     def load_image(self):
         file_path = filedialog.askopenfilename(filetypes=[("Image files", "*.png *.jpg *.jpeg *.bmp *.gif")])
@@ -338,6 +346,9 @@ class ImageBinarizerApp:
 
         self.dropdown_var.set(current_direction)
         self.dropdown_menu.configure(values=lang['dropdown_options'])
+
+        self.draw_histogram(self.original_image, self.histogram_canvas)
+        self.draw_histogram(self.binary_image, self.output_histogram_canvas, is_binary=True)
 
 
 if __name__ == "__main__":
