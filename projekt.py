@@ -37,7 +37,7 @@ class ImageBinarizerApp:
             },
             'en': {
                 'title': 'Conditional binarization',
-                'title_label': 'Conditional binarization',
+                'title_label': 'Conditional binarisation',
                 'load': 'Load Image',
                 'binarize': 'Binarise',
                 'save': 'Save image',
@@ -163,10 +163,9 @@ class ImageBinarizerApp:
         if image is not None:
             canvas.delete("all")
 
-            hist = cv2.calcHist([image], [0], None, [256], [0, 256])
+            hist = cv2.calcHist([image], [0], None, [261], [-5, 256])
 
             scale_factor = 0.98
-
             canvas_height = int(250 * scale_factor)
             canvas_width = int(250 * scale_factor)
 
@@ -177,8 +176,8 @@ class ImageBinarizerApp:
                                fill="black", width=2)
             canvas.create_line(30, 10, 30, canvas_height - 30, fill="black", width=2)
 
-            bar_width = (canvas_width - 40) / 256
-            for i in range(256):
+            bar_width = (canvas_width - 40) / 261
+            for i in range(261):
                 height = int(normalized_hist[i][0])
                 x1 = 30 + i * bar_width
                 y1 = canvas_height - 30
@@ -186,9 +185,9 @@ class ImageBinarizerApp:
                 y2 = canvas_height - 30 - height
                 canvas.create_line(x1, y1, x1, y2, fill="black")
 
-            value_points = [0, 50, 100, 150, 200, 255]
+            value_points = [0, 1, 50, 100, 150, 200, 255]
             for value in value_points:
-                x = 30 + value * (canvas_width - 40) / 255
+                x = 30 + (value + 5) * (canvas_width - 40) / 260
                 canvas.create_line(x, canvas_height - 30, x, canvas_height - 25, fill="black")
                 canvas.create_text(x, canvas_height - 18, text=str(value), fill="black")
 
