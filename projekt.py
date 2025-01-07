@@ -9,8 +9,8 @@ class ImageBinarizerApp:
     def __init__(self, master):
         self.master = master
         master.title("Binaryzacja warunkowa")
-        master.geometry("950x810")
-        master.minsize(950, 810)
+        master.geometry("810x675")
+        master.minsize(810, 675)
 
         ctk.set_appearance_mode("dark")
         ctk.set_default_color_theme("blue")
@@ -53,96 +53,97 @@ class ImageBinarizerApp:
                 'current_selection': 'Left > Right',
                 'brightness_level': 'Brightness level',
                 'pixel_count': 'Pixel count'
-
-        }
+            }
         }
 
         self.current_lang = 'pl'
         self.original_image = None
         self.binary_image = None
-        font = ("Helvetica", 15, "bold")
-        button_config = {'width': 160, 'height': 35, 'font': font}
+
+        title_font = ("Helvetica", 24, "bold")
+        button_font = ("Helvetica", 14, "bold")
+
+        button_config = {'width': 140, 'height': 30, 'font': button_font}
         self.bg_color = "#2b2b2b"
 
         container = ctk.CTkFrame(master)
         container.pack(fill=ctk.BOTH, expand=True)
 
         title_frame = ctk.CTkFrame(container, fg_color=self.bg_color)
-        title_frame.pack(fill=ctk.X, padx=10, pady=(10, 0))
+        title_frame.pack(fill=ctk.X, padx=5, pady=(5, 0))
 
-        title_label = ctk.CTkLabel(title_frame,text="Binaryzacja warunkowa",font=("Helvetica", 32, "bold"), height=50 )
-        title_label.pack(pady=10)
+        title_label = ctk.CTkLabel(title_frame, text="Binaryzacja warunkowa", font=title_font, height=10)
+        title_label.pack(pady=5)
         self.title_label = title_label
 
-
         main_frame = ctk.CTkFrame(container, fg_color=self.bg_color)
-        main_frame.pack(fill=ctk.BOTH, expand=True, padx=10, pady=10)
+        main_frame.pack(fill=ctk.BOTH, expand=True, padx=5, pady=5)
 
-        menu_frame = ctk.CTkFrame(main_frame, width=240)
-        menu_frame.pack(side=ctk.LEFT, fill=ctk.BOTH, padx=0, pady=0)
+        menu_frame = ctk.CTkFrame(main_frame, width=200)  # Reduced from 240
+        menu_frame.pack(side=ctk.LEFT, fill=ctk.Y, padx=5, pady=5)
         menu_frame.pack_propagate(False)
 
         content_frame = ctk.CTkFrame(main_frame)
-        content_frame.pack(side=ctk.RIGHT, fill=ctk.BOTH, expand=True, padx=10, pady=10)
+        content_frame.pack(side=ctk.LEFT, fill=ctk.BOTH, expand=True, padx=5, pady=5)
 
         top_frame = ctk.CTkFrame(content_frame)
-        top_frame.pack(fill=ctk.X, padx=5, pady=5)
+        top_frame.pack(fill=ctk.X, pady=5)
 
         input_frame = ctk.CTkFrame(top_frame)
-        input_frame.pack(side=ctk.LEFT, padx=50, pady=25)
+        input_frame.pack(side=ctk.LEFT, padx=20, pady=5)
 
-        self.image_label = ctk.CTkLabel(input_frame, text="Obraz wejściowy", **button_config)
-        self.image_label.pack()
+        self.image_label = ctk.CTkLabel(input_frame, text="Obraz wejściowy", font=button_font)
+        self.image_label.pack(pady=2)
         self.original_canvas = ctk.CTkCanvas(input_frame, width=250, height=250, bg="white", highlightthickness=0)
         self.original_canvas.pack()
 
+        # Histogram frame with reduced padding
         histogram_frame = ctk.CTkFrame(top_frame)
-        histogram_frame.pack(side=ctk.LEFT, padx=25)
+        histogram_frame.pack(side=ctk.LEFT, padx=20)
 
-        self.histogram_label = ctk.CTkLabel(histogram_frame, text="Histogram obrazu wejściowego", **button_config)
-        self.histogram_label.pack()
+        self.histogram_label = ctk.CTkLabel(histogram_frame, text="Histogram obrazu wejściowego", font=button_font)
+        self.histogram_label.pack(pady=2)
         self.histogram_canvas = ctk.CTkCanvas(histogram_frame, width=250, height=250, bg="white", highlightthickness=0)
         self.histogram_canvas.pack()
 
         output_frame = ctk.CTkFrame(content_frame)
-        output_frame.pack(fill=ctk.X, padx=5, pady=5)
+        output_frame.pack(fill=ctk.X, pady=5)
 
         output_image_frame = ctk.CTkFrame(output_frame)
-        output_image_frame.pack(side=ctk.LEFT, padx=50, pady=25)
+        output_image_frame.pack(side=ctk.LEFT, padx=20, pady=5)
 
-        self.final_label = ctk.CTkLabel(output_image_frame, text="Obraz wyjściowy", **button_config)
-        self.final_label.pack()
-        self.final_canvas = ctk.CTkCanvas(output_image_frame, width=250, height=250, bg="white",
-                                          highlightthickness=0)
+        self.final_label = ctk.CTkLabel(output_image_frame, text="Obraz wyjściowy", font=button_font)
+        self.final_label.pack(pady=2)
+        self.final_canvas = ctk.CTkCanvas(output_image_frame, width=250, height=250, bg="white", highlightthickness=0)
         self.final_canvas.pack()
 
         output_histogram_frame = ctk.CTkFrame(output_frame)
-        output_histogram_frame.pack(side=ctk.LEFT, padx=25)
+        output_histogram_frame.pack(side=ctk.LEFT, padx=20)
 
         self.output_histogram_label = ctk.CTkLabel(output_histogram_frame, text="Histogram obrazu wyjściowego",
-                                                   **button_config)
-        self.output_histogram_label.pack()
+                                                   font=button_font)
+        self.output_histogram_label.pack(pady=2)
         self.output_histogram_canvas = ctk.CTkCanvas(output_histogram_frame, width=250, height=250, bg="white",
                                                      highlightthickness=0)
         self.output_histogram_canvas.pack()
 
         self.load_button = ctk.CTkButton(menu_frame, text="Wczytaj obraz", command=self.load_image, **button_config)
-        self.load_button.pack(pady=25, padx=10)
+        self.load_button.pack(pady=15, padx=5)
 
         self.lower_thresh_label = ctk.CTkLabel(menu_frame, text="Dolny próg:", **button_config)
         self.lower_thresh_label.pack(pady=(10, 0), padx=10)
         self.lower_thresh = ctk.CTkEntry(menu_frame, **button_config)
-        self.lower_thresh.pack(pady=(0, 10), padx=10)
+        self.lower_thresh.pack(pady=(0, 15), padx=10)
         self.lower_thresh.insert(0, "100")
 
         self.higher_thresh_label = ctk.CTkLabel(menu_frame, text="Górny próg:", **button_config)
         self.higher_thresh_label.pack(pady=(10, 0), padx=10)
         self.higher_thresh = ctk.CTkEntry(menu_frame, **button_config)
-        self.higher_thresh.pack(pady=(0, 10), padx=10)
+        self.higher_thresh.pack(pady=(0, 15), padx=10)
         self.higher_thresh.insert(0, "150")
 
-        self.dropdown_label = ctk.CTkLabel(menu_frame, text="Wybierz kierunek:", **button_config)
-        self.dropdown_label.pack(pady=(10, 0), padx=10)
+        self.dropdown_label = ctk.CTkLabel(menu_frame, text="Wybierz kierunek:", font=button_font)
+        self.dropdown_label.pack(pady=(10, 0), padx=5)
 
         self.dropdown_var = ctk.StringVar(value="Lewo > Prawo")
         self.dropdown_menu = ctk.CTkOptionMenu(menu_frame,
@@ -151,13 +152,13 @@ class ImageBinarizerApp:
         self.dropdown_menu.pack(pady=(0, 15), padx=10)
 
         self.process_button = ctk.CTkButton(menu_frame, text="Binaryzuj", command=self.binarize_image, **button_config)
-        self.process_button.pack(pady=15, padx=10)
+        self.process_button.pack(pady=15, padx=5)
 
         self.save_button = ctk.CTkButton(menu_frame, text="Zapisz obraz", command=self.save_image, **button_config)
-        self.save_button.pack(pady=15, padx=10)
+        self.save_button.pack(pady=15, padx=5)
 
         self.language_button = ctk.CTkButton(menu_frame, text="English", command=self.change_language, **button_config)
-        self.language_button.pack(side=ctk.BOTTOM, pady=20, padx=10)
+        self.language_button.pack(side=ctk.BOTTOM, pady=10, padx=5)
 
     def draw_histogram(self, image, canvas, is_binary=False):
         if image is not None:
@@ -193,9 +194,9 @@ class ImageBinarizerApp:
 
             lang = self.languages[self.current_lang]
             canvas.create_text(canvas_width // 2, canvas_height - 5,
-                               text=lang['brightness_level'], fill="black", font=("Helvetica", 10, "bold"))
+                               text=lang['brightness_level'], fill="black", font=("Helvetica", 8, "bold"))
             canvas.create_text(15, canvas_height // 2,
-                               text=lang['pixel_count'], fill="black", angle=90, font=("Helvetica", 10, "bold"))
+                               text=lang['pixel_count'], fill="black", angle=90, font=("Helvetica", 8, "bold"))
 
     def load_image(self):
         file_path = filedialog.askopenfilename(filetypes=[("Image files", "*.png *.jpg *.jpeg *.bmp *.gif")])
