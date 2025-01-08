@@ -60,6 +60,23 @@ class ImageBinarizerApp:
         self.original_image = None
         self.binary_image = None
 
+        # def get_system_font():
+        #     font_names = ["Helvetica", "Arial", "Segoe UI", "MS Sans Serif", "System"]
+
+        #     try:
+        #         from tkinter import font
+        #         available_fonts = [f.lower() for f in font.families()]
+
+        #         for font_name in font_names:
+        #             if font_name.lower() in available_fonts:
+        #                 return font_name
+        #     except:
+        #         pass
+
+        #     return "TkDefaultFont"
+
+        title_font = (get_system_font(), 24, "bold")
+        button_font = (get_system_font(), 14, "bold")
         title_font = ("Helvetica", 24, "bold")
         button_font = ("Helvetica", 14, "bold")
 
