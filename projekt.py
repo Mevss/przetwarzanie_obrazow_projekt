@@ -212,6 +212,37 @@ class ImageBinarizerApp:
 
             self.draw_histogram(self.original_image, self.histogram_canvas)
 
+    # def load_image(self):
+    #     # initial_dir = os.path.dirname(os.path.abspath(__file__))
+    #     # initial_dir = os.path.dirname(sys.executable)
+    #     if getattr(sys, 'frozen', False):
+    #         base_dir = os.path.dirname(sys.executable)
+    #     else:
+    #         base_dir = os.path.dirname(os.path.abspath(__file__))
+    # 
+    #     assets_dir = os.path.join(base_dir, 'assets')
+    # 
+    #     if os.path.exists(assets_dir):
+    #         initial_dir = assets_dir
+    #     else:
+    #         initial_dir = base_dir
+    # 
+    #     file_path = filedialog.askopenfilename(
+    #         initialdir=initial_dir,
+    #         filetypes=[("Image files", "*.png *.jpg *.jpeg *.bmp *.gif")]
+    #     )
+    #     if file_path:
+    #         img = cv2.imread(file_path, cv2.IMREAD_GRAYSCALE)
+    #         self.original_image = img.copy()
+    # 
+    #         display_img = cv2.resize(img, (250, 250), interpolation=cv2.INTER_AREA)
+    # 
+    #         display_img = Image.fromarray(display_img)
+    #         self.original_photo = ImageTk.PhotoImage(display_img)
+    #         self.original_canvas.create_image(125, 125, image=self.original_photo, anchor=ctk.CENTER)
+    # 
+    #         self.draw_histogram(self.original_image, self.histogram_canvas)
+    
     def binarize_image(self):
         if self.original_image is not None:
             selected_direction = self.dropdown_var.get()
